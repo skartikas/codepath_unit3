@@ -1,55 +1,39 @@
-import React from 'react'
-import { useRoutes, Link } from 'react-router-dom'
-import Locations from './pages/Locations'
-import LocationEvents from './pages/LocationEvents'
-import Events from './pages/Events'
-import './App.css'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const App = () => {
-  let element = useRoutes([
-    {
-      path: '/',
-      element: <Locations />
-    },
-    {
-      path: '/echolounge',
-      element: <LocationEvents index={1} />
-    },
-    {
-      path: '/houseofblues',
-      element: <LocationEvents index={2} />
-    },
-    {
-      path: '/pavilion',
-      element: <LocationEvents index={3} />
-    },
-    {
-      path: '/americanairlines',
-      element: <LocationEvents index={4} />
-    },
-    {
-      path: '/events',
-      element: <Events />
+  const [locations, setLocations] = useState([]);
+  const getAllLocations = async () => {
+    const { data } = await axios.get("http://localhost:3000/api/locations");
+    const temp = [];
+    for (const ele of data) {
+      temp.push(ele);
     }
-  ])
+    setLocations(temp);
+  };
+  useEffect(() => {
+    getAllLocations();
+  }, []);
 
   return (
-    <div className='app'>
-
-      <header className='main-header'>
-        <h1>UnityGrid Plaza</h1>
-
-        <div className='header-buttons'>
-          <Link to='/' role='button'>Home</Link>
-          <Link to='/events' role='button'>Events</Link>
-        </div>
-      </header>
-
+    <div className="app flex flex-col items-center">
+      <h1 class="text-1xl font-bold text-gray-800 dark:text-white lg:text-4xl mb-5">
+        Find games by locations
+      </h1>
       <main>
-        {element}
+        {locations &&
+          locations.map(({ location }) => (
+            <a
+              href={"/locations/" + location.replaceAll(" ", "-")}
+              key={locations}
+            >
+              <button className="px-4 py-1">{location}</button>
+            </a>
+          ))}
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
